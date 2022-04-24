@@ -1,0 +1,142 @@
+<!-- 一些设定，不用细究~ -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="user-scalable=no, width=device-width,initial-scale=1.0">
+<meta content="telephone=no" name="format-detection">
+<meta http-equiv="X-UA-Compatible" content="requiresActiveX=true">
+<link href="https://cdn.jsdelivr.net/gh/kmioss/xmoss6/yxsf/yh_css/m.css?ver=566357" rel="stylesheet" type="text/css">
+
+<!-- 大大的樱花动漫头部边框 -->
+<title>樱花动漫P-设置</title>
+<div class="head">
+    <div class="logo fl">
+        <a href="https://m.yhdmp.live/" title="樱花动漫(P)">樱花动漫(P)</a></div>
+    <div class="nav fr">
+        <a href="https://m.yhdmp.live/s_all?kw=" title="搜索">
+            <i class="so"></i>
+        </a>
+        <a href="https://m.yhdmp.live/playlog/" title="播放记录">
+            <i class="his"></i>
+        </a>
+    </div>
+</div>
+
+<!-- 下面是需要慢慢补充改进的： -->
+
+<!-- 下面是一些功能性设置 -->
+
+
+<div id="head_setting" style="margin-bottom: 20px; margin-left: 2px; margin-right: 3px;">
+    <p style="font-size: 25px; margin-bottom: 10px; margin-top: 5px;">设置</p>
+    <p>下面你可以设置这个app的一些东西</p>
+    <p>记得更改设置之后点击一下保存~</p>
+</div>
+
+<!-- 备忘录 -->
+<div style="margin-bottom: 20px; margin-left: 2px; margin-right: 2px;">
+    <p style="font-size: 20px;">备忘录</p>
+    <textarea cols=1 rows=1 id="notes_for_bangumi" style="height:20%;width:100%;border: 1px pink solid; margin-bottom: 5px;" placeholder="想看的番在这记下来~"></textarea><br>
+    备忘录的高度：<input type="number" id="notes_for_test" value="20" style="width: 25px; border: none;">%
+    <input type="button" style="border: none;margin-left: 10px;"
+        onclick="h=document.getElementById('notes_for_test').value;
+                document.getElementById('notes_for_bangumi').style.height=h+'%';
+                window.localStorage.setItem('height_notes',''+h);" 
+        value="set >>"><br>
+    <script>
+        h=window.localStorage.getItem('height_notes');
+        if (h){
+            document.getElementById('notes_for_bangumi').style.height=h+'%';
+            document.getElementById('notes_for_test').value=h;
+        }
+    </script>
+</div>
+
+<!-- 保存设置 -->
+<div style="margin-top: 15px; margin-bottom: 20px; margin-left: 2px; margin-right: 3px;">
+    <div style="float: left; margin-left: 5px;">
+        <input type="button" value="召唤键盘" onclick="alert('好的，你找回了键盘')">
+    </div>
+    <input type="submit" value="保存" id="SaveSetting" 
+        style="float: right; height: 30px; width: 60px; border-radius:10px; margin-right: 20px;"><br>
+</div>
+
+<!-- 跳op时长 -->
+<div style="margin-top: 15px; margin-bottom: 20px; margin-left: 2px; margin-right: 3px;">
+    跳op时长设定：<input type="number" id="timeSet_skipOp" value="85" style="height: 20px; width: 50px;" min="0" max="100" step="1"><br>
+    <p style="font-size: 13px;">（单位为秒）</p>
+</div>
+
+<!-- 播放记录 -->
+<div id="playLog" style="margin-top: 5px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
+    是否开启播放记录并自动跳转？
+    <input type="radio" name="play_history" id="history_check_yes" >是
+    <input type="radio" name="play_history" id="history_check_no" checked>否<br>
+    以及播放记录保存时间设定：<input type="number" id="play_history_during" value="10" style="height: 20px; width: 50px; margin-top: 10px;" min="0" max="100" step="1"><br>
+    <p style="font-size: 12px;">（时间单位为天，这一项请勿频繁修改）</p>
+    
+    <div id="playLog_number" style="float: left;">
+        <p>当前已记录播放记录数量</p>
+    </div>
+    <div id="playLog_number_next" style="float: right;">
+        <input type="submit" value="清空记录" id="clear_logs">
+    </div>
+</div><br>
+
+<!-- 广告信息 -->
+<div id="ad_setting" style="margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
+    <div id="ad_p1" style="float: left">
+        <p>当前已屏蔽广告数量</p>
+    </div>
+    
+    <details id="ad_p2" style="font-size: 13px;">
+        <summary id="ad_p2_summary">具体有：</summary>
+    </details>
+
+</div>
+
+<HR color="pink">
+
+<!-- <script src="Settings.js"></script> -->
+<!-- 乱七八糟的文字 -->
+<p style="font-size: 16px;">写在后面</p>
+<i style="font-size: 14px;">欢迎使用本app~~~</i><br>
+<details>
+    <summary style="font-size: 13px; color: rgb(102, 204, 255);">展开更多</summary>
+    <div id="words_to_say" style="margin-bottom: 10px; font-size: 11px; margin-left: 2px; margin-right: 3px;">
+        <p>这部分是一些乱七八糟的东西，防止影响观感我把字体调小了点~</p>
+        <p>这个app本身就是一个网页，塞的是樱花动漫的网址：yhdmp.live。</p>
+        <p style="margin-top: 5px;">可以直接去浏览器看番，但手机版的网页有广告，而电脑上是没有的，所以喜欢用电脑看番建议直接用电脑浏览器去这个网站( yhdmp.live )。
+            你要问那这个app有毛用，那你要是用手机看番，就用这个；电脑那就直接去浏览器，就没这些破事了……
+        </p>
+        <p>那为啥我不用B站呢，一是B站的短视频让我不能专心追番；二是B站好多番要会员，有些番还会手动和谐，还有些这里的番B站没有。
+            弹幕评论啥的倒确实没有，那不重要，不管了。
+        </p>
+        <p style="margin-top: 5px;">这个app的唯一长处就是把广告给屏蔽掉了。有时候可能由于各种原因加载不出来，导致广告没有关掉。
+            但即便如此，你不会看到广告，并且就算点击了广告区域也不会跳转。
+        </p>
+        <p>广告的问题，其实樱花每隔一段时间都会更换广告来源，它每次更换之后我都要记录并刷新页面。
+            记录的广告我认为这是你使用这个app的象征、战绩，类似于打卡，广告记录的越多说明用的越久🤗
+        </p>
+        <p>另外因为屏蔽广告的需要，这个app设定指向yhdm的网页，除此之外的网站不能跳转</p>
+        <p>所有设置的更改都要保存后才会生效</p>
+        <p>如果视频播放的界面没有出现设置按钮和跳op的按钮，那说明出了点问题，页面暂时没加载好，额，这个我也没能解决……</p>
+        <p>对于有时候点不出来输入法的问题，这时候就点击-召唤键盘-即可找回。
+            搜索页面也有这个问题，如果出现这个问题就点击那个搜索框，就找回键盘了。
+            别问我为啥是这么弱智的方式,,,问就是能力不足暂时没找到更好的办法……
+        </p>
+        <p>下载的功能，我偷懒简写了……让它跳转到你的浏览器去下载了，但现在好像有问题了</p>
+        <p>一直想改这个播放器，主要是快进太难受，难以精准降落，但播放器太难搞，所以暂时不想了……</p>
+
+        <p style="margin-top: 5px;">这个页面写的朴实无华还有点丑，但，能用就行😂</p>
+        <p>我想把这些放到啥网站或者网盘上面什么的，以后有更新也可以再按自己需求下载，但我懒得搞了……😂有需求可以下面QQ……</p>
+        <p>还有，，，额，想到啥写啥吧</p>
+        <p style="font-size: 15px;">呸，这个人已经再起不能，无力再写了。毁灭吧，我累了………</p>
+        <p>这个版本可能就很久不会再更新了。？这天是2022.1.21</p>
+        <p>2022.4.15- 嘿，又更了。2.6：播放记录功能优化，强无敌~</p>
+    </div>
+</details>
+
+<p style="margin-top: 10px">当前版本: 2.6</p>
+
+<div id="author_setting" style="margin-top: 20px; margin-bottom: 10px;">
+    <p style="font-family:'Times New Roman','楷体';">如有问题请及时反馈给写这个app的伟人: QQ: 2634205895</p>
+</div>
