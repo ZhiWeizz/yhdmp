@@ -11,6 +11,7 @@
     <div class="logo fl">
         <a href="https://m.yhdmp.live/" title="樱花动漫(P)">樱花动漫(P)</a></div>
     <div class="nav fr">
+        <a id="nav_fr_to_pc"></a>
         <a href="https://m.yhdmp.live/s_all?kw=" title="搜索">
             <i class="so"></i>
         </a>
@@ -20,15 +21,13 @@
     </div>
 </div>
 
-<!-- 下面是需要慢慢补充改进的： -->
+<!-- 以下是需要慢慢补充改进的： -->
+
 
 <!-- 下面是一些功能性设置 -->
-
-
 <div id="head_setting" style="margin-bottom: 20px; margin-left: 2px; margin-right: 3px;">
     <p style="font-size: 25px; margin-bottom: 10px; margin-top: 5px;">设置</p>
     <p>下面你可以设置这个app的一些东西</p>
-    <p>记得更改设置之后点击一下保存~</p>
 </div>
 
 <!-- 备忘录 -->
@@ -48,15 +47,6 @@
             document.getElementById('notes_for_test').value=h;
         }
     </script>
-</div>
-
-<!-- 保存设置 -->
-<div style="margin-top: 15px; margin-bottom: 20px; margin-left: 2px; margin-right: 3px;">
-    <div style="float: left; margin-left: 5px;">
-        <input type="button" value="召唤键盘" onclick="alert('好的，你找回了键盘')">
-    </div>
-    <input type="submit" value="保存" id="SaveSetting" 
-        style="float: right; height: 30px; width: 60px; border-radius:10px; margin-right: 20px;"><br>
 </div>
 
 <!-- 跳op时长 -->
@@ -86,57 +76,66 @@
     <div id="ad_p1" style="float: left">
         <p>当前已屏蔽广告数量</p>
     </div>
-    
     <details id="ad_p2" style="font-size: 13px;">
         <summary id="ad_p2_summary">具体有：</summary>
     </details>
 
 </div>
 
-<HR color="pink">
+
+<HR color="pink"></hr>
 
 <!-- <script src="Settings.js"></script> -->
-<!-- 乱七八糟的文字 -->
-<p style="font-size: 16px;">写在后面</p>
-<i style="font-size: 14px;">欢迎使用本app~~~</i><br>
-<details>
-    <summary style="font-size: 13px; color: rgb(102, 204, 255);">展开更多</summary>
-    <div id="words_to_say" style="margin-bottom: 10px; font-size: 11px; margin-left: 2px; margin-right: 3px;">
-        <p>这部分是一些乱七八糟的东西，防止影响观感我把字体调小了点~</p>
-        <p>这个app本身就是一个网页，塞的是樱花动漫的网址：yhdmp.live。</p>
-        <p style="margin-top: 5px;">可以直接去浏览器看番，但手机版的网页有广告，而电脑上是没有的，所以喜欢用电脑看番建议直接用电脑浏览器去这个网站( yhdmp.live )。
-            你要问那这个app有毛用，那你要是用手机看番，就用这个；电脑那就直接去浏览器，就没这些破事了……
-        </p>
-        <p>那为啥我不用B站呢，一是B站的短视频让我不能专心追番；二是B站好多番要会员，有些番还会手动和谐，还有些这里的番B站没有。
-            弹幕评论啥的倒确实没有，那不重要，不管了。
-        </p>
-        <p style="margin-top: 5px;">这个app的唯一长处就是把广告给屏蔽掉了。有时候可能由于各种原因加载不出来，导致广告没有关掉。
-            但即便如此，你不会看到广告，并且就算点击了广告区域也不会跳转。
-        </p>
-        <p>广告的问题，其实樱花每隔一段时间都会更换广告来源，它每次更换之后我都要记录并刷新页面。
-            记录的广告我认为这是你使用这个app的象征、战绩，类似于打卡，广告记录的越多说明用的越久🤗
-        </p>
-        <p>另外因为屏蔽广告的需要，这个app设定指向yhdm的网页，除此之外的网站不能跳转</p>
-        <p>所有设置的更改都要保存后才会生效</p>
-        <p>如果视频播放的界面没有出现设置按钮和跳op的按钮，那说明出了点问题，页面暂时没加载好，额，这个我也没能解决……</p>
-        <p>对于有时候点不出来输入法的问题，这时候就点击-召唤键盘-即可找回。
-            搜索页面也有这个问题，如果出现这个问题就点击那个搜索框，就找回键盘了。
-            别问我为啥是这么弱智的方式,,,问就是能力不足暂时没找到更好的办法……
-        </p>
-        <p>下载的功能，我偷懒简写了……让它跳转到你的浏览器去下载了，但现在好像有问题了</p>
-        <p>一直想改这个播放器，主要是快进太难受，难以精准降落，但播放器太难搞，所以暂时不想了……</p>
+<p style="font-size: 16px; margin-left: 2px;">写在后面</p>
+<i style="font-size: 14px; margin-left: 2px; margin-bottom: 5px;">欢迎使用本app~~~</i><br>
 
-        <p style="margin-top: 5px;">这个页面写的朴实无华还有点丑，但，能用就行😂</p>
-        <p>我想把这些放到啥网站或者网盘上面什么的，以后有更新也可以再按自己需求下载，但我懒得搞了……😂有需求可以下面QQ……</p>
-        <p>还有，，，额，想到啥写啥吧</p>
-        <p style="font-size: 15px;">呸，这个人已经再起不能，无力再写了。毁灭吧，我累了………</p>
-        <p>这个版本可能就很久不会再更新了。？这天是2022.1.21</p>
-        <p>2022.4.15- 嘿，又更了。2.6：播放记录功能优化，强无敌~</p>
+<!-- 版本记录 -->
+<details style="margin-left: 2px; margin-bottom: 5px; margin-top: 10px;">
+    <summary style="font-size: 14px; color: rgb(102, 204, 255);">版本记录</summary>
+    <div id="logs_version" style="margin-bottom: 10px; font-size: 13px; margin-left: 2px; margin-right: 3px;">
+        <p>2.7: <b>全屏问题</b>解决，设置的改动自动保存</p>
+        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.4.25</i>
+        <p>2.6: <b>播放记录问题</b>解决，跳op真正的神~</p>
+        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.4.15</i>
+        <p>2.5: 开放了<b>下载</b>功能，可以跳到浏览器下载</p>
+        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.21</i>
+        <p>2.4: 新的突破：增加记录<b>播放记录</b>的功能，但经常失效…</p>
+        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.7</i>
+        <p>2.3: 把跳op的按钮按钮放进来，可以调参数</p>
+        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.5</i>
+        <p>2.2: 加入了备忘录框，以及别的各种乱七八糟的东西</p>
+        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.3</i>
+        <p>2.1: 加入了<b>设置</b>界面</p>
+        <p style="font-size: 15px; margin-bottom: 5px;">2.0: 前面各位都是lj，这位是重大突破：记录广告，<b>彻底解决广告问题</b>。这个版本才是真正的能用，能用一万年</p>
+        
+        <p>1.n: 剩下的同样还是各种垃圾，广告一直是大问题</p>
+        <p>1.3: <b>屏蔽且删除广告</b>，这回干净了</p>
+        <p>1.2: 添加了个<b>跳op</b>按钮，偶尔的神</p>
+        <p>1.1: <b>开放了JS</b>，同时屏蔽部分广告，能用</p>
+        <p>1.0: 无JS，功能很受限，但能用</p>
     </div>
 </details>
 
-<p style="margin-top: 10px">当前版本: 2.6</p>
+<!-- 剩余问题 -->
+<details style="margin-left: 2px; margin-bottom: 5px;">
+    <summary style="font-size: 14px; color: orange;">剩余问题</summary>
+    <div id="problems" style="margin-bottom: 5px; font-size: 13px; margin-left: 2px; margin-right: 3px;">
+        <p>1. 有时候JS加载不出来，SSL问题？</p>
+        <p>2. 下载问题，需要专门写个下载方式，当前的有些问题</p>
+        <p>3. 自动获取更新</p>
+        <p>4. 播放器，有待改进</p>
+    </div>
+</details>
 
-<div id="author_setting" style="margin-top: 20px; margin-bottom: 10px;">
-    <p style="font-family:'Times New Roman','楷体';">如有问题请及时反馈给写这个app的伟人: QQ: 2634205895</p>
+<p style="margin-top: 10px; margin-left: 2px; margin-bottom: 20px;">当前版本: 2.7</p>
+
+
+<HR color="pink"></hr>
+
+<div id="author_setting" style="margin-left: 2px; margin-top: 10px; margin-bottom: 10px; font-family:'Times New Roman','楷体';">
+    <p style="margin-top: 5px; margin-bottom: 10px;">通过 QQ 反馈: 2634205895</p>
+    <p>从 GitHub 获取更新：</p>
+    <p style="margin-top: 5px; margin-bottom: 5px; margin-left: 5px; overflow: hidden; word-break: break-all; word-wrap: break-word;">
+        https://github.com/ZhiWeizz/yhdmp/tree/master/release</p>
+    <p>请自行复制到浏览器查看更新~</p>
 </div>

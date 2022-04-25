@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.DownloadListener;
@@ -356,28 +357,30 @@ public class MainActivity extends AppCompatActivity {
 
                 // 显示设置         div1s, div2s, div3s, div_saveSet, p1,p2,p3,strings
                 webView.loadUrl("javascript:"
-                                +"var div1s=document.getElementById('notes_for_bangumi');if (div1s){"
-                                +"div1s.value='"+p1+"';"
-                                +"var div2s=document.getElementById('notes_for_test');"
-                                +"var div3s=document.getElementById('timeSet_skipOp');"
-                                +"div3s.value="+timeSet_skipOp+";"
-                                +"var div4y=document.getElementById('history_check_yes');"
-                                +"var div4n=document.getElementById('history_check_no');"
-                                +"if ("+is_log_play_history+"){div4y.checked=true;}"
-                                +"else {div4n.checked=true;};"
-                                +"var div5s=document.getElementById('play_history_during');"
-                                +"div5s.value="+during_history+";"
+                    +"var div1s=document.getElementById('notes_for_bangumi');if (div1s){"
+                        +"div1s.value='"+p1+"';"
+                        +"var div2s=document.getElementById('notes_for_test');"
+                        +"var div3s=document.getElementById('timeSet_skipOp');"
+                        +"div3s.value="+timeSet_skipOp+";"
+                        +"var div4y=document.getElementById('history_check_yes');"
+                        +"var div4n=document.getElementById('history_check_no');"
+                        +"if ("+is_log_play_history+"){div4y.checked=true;}"
+                        +"else {div4n.checked=true;};"
+                        +"var div5s=document.getElementById('play_history_during');"
+                        +"div5s.value="+during_history+";"
 
-                                +"var div_saveSet=document.getElementById('SaveSetting');"
-                                +"div_saveSet.onclick=function(){"
-                                +"var p1=div1s.value.split('\\n').join('Sign_N_ZhiWei').split('\\r').join('Sign_R_ZhiWei');"
-                                +"var p2=div2s.value.split('\\n').join('Sign_N_ZhiWei').split('\\r').join('Sign_R_ZhiWei');"
-                                +"var p3=div3s.value;"
-                                +"var p4=div4y.checked;"
-                                +"var p5=div5s.value;"
-                                +"var strings= '{' + 'p1:' +'\"'+p1+'\"'  +',p2:'+'\"'+p2+'\"'  +',p3:'+'\"'+p3+'\"' +',p4:'+'\"'+p4+'\"' +',p5:'+'\"'+p5+'\"' +'}';"
-                                +"Settings.save_settings(strings);};"
-                                +"}"
+                        +"var settings_temp='nth';"
+                        +"function save_settings(){"
+                            +"var p1=div1s.value.split('\\n').join('Sign_N_ZhiWei').split('\\r').join('Sign_R_ZhiWei');"
+                            +"var p2=div2s.value.split('\\n').join('Sign_N_ZhiWei').split('\\r').join('Sign_R_ZhiWei');"
+                            +"var p3=div3s.value;"
+                            +"var p4=div4y.checked;"
+                            +"var p5=div5s.value;"
+                            +"var settings_new= '{' + 'p1:' +'\"'+p1+'\"'  +',p2:'+'\"'+p2+'\"'  +',p3:'+'\"'+p3+'\"' +',p4:'+'\"'+p4+'\"' +',p5:'+'\"'+p5+'\"' +'}';"
+                            +"if (settings_temp != settings_new){Settings.save_settings(settings_new);};"
+                            +"settings_temp = settings_new;"
+                        +"}"
+                    +"setInterval(save_settings, 200);}"
                 );
 
                 // 私货js，防止骚扰加个小概率，放在最后      new1, new2
@@ -447,10 +450,14 @@ public class MainActivity extends AppCompatActivity {
                                 +"Settings.print('load successfully');"
                             +"};"
 
-                            // 定义延迟函数
-                            +"function sleep(time){return new Promise((resolve)=>setTimeout(resolve,time));};"
-                            // 加载监听
-                            +"(async function(){"+"t=0;while (t<30 & !getVideo() & "+is_log_play_history+"){t=t+1;Settings.print('尝试次数：'+t);await sleep(100);};if ("+is_log_play_history+"){listen();};})();"
+                            // 新的延迟sleep方式
+                            +"if ("+is_log_play_history+"){"
+                            +"var times_for_load = 1000;"
+                            +"var interval = setInterval(function(){"
+                            +"if (getVideo() || times_for_load <0){"
+                            +"clearInterval(interval);"
+                            +"listen();} else{times_for_load = times_for_load -1;};"
+                            +"}, 100);};"
 
                         +"});"
                 );
@@ -461,50 +468,27 @@ public class MainActivity extends AppCompatActivity {
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
-            private CustomViewCallback mCustomViewCallback;
-            private View mCustomView;
-
+            ViewGroup parent = (ViewGroup) webView.getParent();
+            // 全屏
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
                 super.onShowCustomView(view, callback);
-
-/*    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    webView.setVisibility(View.GONE);*/
-                /*    super.onShowCustomView(view,callback);*/
-
-                //如果view 已经存在，则隐藏
-                if (mCustomView != null) {
-                    callback.onCustomViewHidden();
-                    return;
-                }
-
-                mCustomView = view;
-                mCustomView.setVisibility(View.VISIBLE);
-                mCustomViewCallback = callback;
-                mLayout.addView(mCustomView);
+                mLayout.addView(view);
                 mLayout.setVisibility(View.VISIBLE);
                 mLayout.bringToFront();
-
-                //设置横屏
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
+                parent.removeView(webView);
+//                setFullScreen();
             }
 
+            // 退出全屏
             @Override
             public void onHideCustomView() {
+//                webView.bringToFront();
+                parent.addView(webView);
                 super.onHideCustomView();
-                if (mCustomView == null) {
-                    return;
-                }
-                mCustomView.setVisibility(View.GONE);
-                mLayout.removeView(mCustomView);
-                mCustomView = null;
+                mLayout.removeAllViews();
                 mLayout.setVisibility(View.GONE);
-                try {
-                    mCustomViewCallback.onCustomViewHidden();
-                } catch (Exception ignored) {
-                }
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);//竖屏
+//                quitFullScreen();
             }
 
         });
@@ -549,7 +533,6 @@ public class MainActivity extends AppCompatActivity {
                         settings_json.put(properties[i],newsettings.getString("p"+(i+1)));
                     }
                     save_file(file_for_setting,settings_json.toString(),"PRIVATE");
-                    Toast.makeText(getApplicationContext(),"保存成功",Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -560,14 +543,9 @@ public class MainActivity extends AppCompatActivity {
                 String data = intent.getStringExtra("data");
                 String name = data.substring(2,data.indexOf(":")-1);
                 String value= data.substring(data.indexOf(":")+2,data.indexOf("}")-1);
+                save_file(file_for_playLog,data+"playLog","APPEND");
                 try {
                     playLog_json.put(name,value);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    JSONObject current_time_log = new JSONObject(data);
-                    save_file(file_for_playLog,data+"playLog","APPEND");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
