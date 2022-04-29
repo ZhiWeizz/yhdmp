@@ -286,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
                 // 设置图标的js，放后面      div_head, btn_setting
                 webView.loadUrl("javascript:"
                                 +"var div_head=document.getElementsByClassName('nav fr')[0];"
+                                +"div_head.removeChild(document.getElementById('nav_fr_to_pc'));"
                                 +"let btn_setting = document.createElement('button');"
                                 +"btn_setting.style=\"position:absolute;right:88px;background-color:transparent;color:#FFFFFF;border:2.4px solid white;border-radius:50%;display:right;height:23px;width:23px;margin-top:10px;text-align:center;font-family:Consolas;font-weight:bold;\";"
                                 +"btn_setting.textContent='S';"
@@ -468,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
-            ViewGroup parent = (ViewGroup) webView.getParent();
+            final ViewGroup parent = (ViewGroup) webView.getParent();
             // 全屏
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
@@ -555,6 +556,7 @@ public class MainActivity extends AppCompatActivity {
             else if (type.equals("clear_logs")){
                 playLog_json = new JSONObject();
                 save_file(file_for_playLog,"","PRIVATE");
+                Toast.makeText(getApplicationContext(),"清空了播放记录",Toast.LENGTH_SHORT).show();
             }
 
         }
