@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     final String file_for_ad="adurls.txt";
 
     // 设置的
-    private final String[] properties = {"notes_for_bangumi","notes_for_test","timeSet_skipOp","is_log_play_history","during_history"};
+    private final String[] properties = {"notes1_aborted","note2_aborted","timeSet_skipOp","is_log_play_history","during_history"};
     private final JSONObject settings_json = new JSONObject();
     final String file_for_setting="settings_contents.txt";
     float timeSet_skipOp = 86; // 跳op的时间
@@ -261,10 +261,11 @@ public class MainActivity extends AppCompatActivity {
 
 //                 删除广告的js，顺便储存广告。第一优先级  div1
                 webView.evaluateJavascript("javascript:"
+                        + "if (document.getElementById('author_setting')===null){"
                         + "var div1=document.getElementsByTagName('style');"
                         +"div1[div1.length-1].nextElementSibling.click();" // 先删
                         + "var returnValue=div1[div1.length-1].innerHTML;" // 后存
-                        + "(function myFunction(value) {return value;})(returnValue);", new ValueCallback<String>() {
+                        + "(function myFunction(value) {return value;})(returnValue);};", new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String value) {
                         if (value.length()>10) {
@@ -328,12 +329,10 @@ public class MainActivity extends AppCompatActivity {
                 );
 
                 // 显示或者保存设置
-                String p1="";
                 String p3="";
                 String p4="";
                 String p5="";
                 try {
-                    p1=settings_json.getString(properties[0]);
                     p3=settings_json.getString(properties[2]);
                     p4=settings_json.getString(properties[3]);
                     p5=settings_json.getString(properties[4]);
@@ -352,15 +351,11 @@ public class MainActivity extends AppCompatActivity {
                     }else {
                         during_history=10;
                     }
-                } catch (JSONException ignored) {
-                }
-                p1=p1.replace("Sign_N_ZhiWei","\\n").replace("Sign_R_ZhiWei","\\r");
+                } catch (JSONException ignored) {}
 
                 // 显示设置         div1s, div2s, div3s, div_saveSet, p1,p2,p3,strings
                 webView.loadUrl("javascript:"
-                    +"var div1s=document.getElementById('notes_for_bangumi');if (div1s){"
-                        +"div1s.value='"+p1+"';"
-                        +"var div2s=document.getElementById('notes_for_test');"
+                    +"if (document.getElementById('author_setting')){"
                         +"var div3s=document.getElementById('timeSet_skipOp');"
                         +"div3s.value="+timeSet_skipOp+";"
                         +"var div4y=document.getElementById('history_check_yes');"
@@ -372,8 +367,8 @@ public class MainActivity extends AppCompatActivity {
 
                         +"var settings_temp='nth';"
                         +"function save_settings(){"
-                            +"var p1=div1s.value.split('\\n').join('Sign_N_ZhiWei').split('\\r').join('Sign_R_ZhiWei');"
-                            +"var p2=div2s.value.split('\\n').join('Sign_N_ZhiWei').split('\\r').join('Sign_R_ZhiWei');"
+                            +"var p1='has_been_aborted';"
+                            +"var p2='has_been_aborted';"
                             +"var p3=div3s.value;"
                             +"var p4=div4y.checked;"
                             +"var p5=div5s.value;"
@@ -473,23 +468,20 @@ public class MainActivity extends AppCompatActivity {
             // 全屏
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
-                super.onShowCustomView(view, callback);
                 mLayout.addView(view);
                 mLayout.setVisibility(View.VISIBLE);
                 mLayout.bringToFront();
                 parent.removeView(webView);
-//                setFullScreen();
+                super.onShowCustomView(view, callback);
             }
 
             // 退出全屏
             @Override
             public void onHideCustomView() {
-//                webView.bringToFront();
                 parent.addView(webView);
-                super.onHideCustomView();
                 mLayout.removeAllViews();
                 mLayout.setVisibility(View.GONE);
-//                quitFullScreen();
+                super.onHideCustomView();
             }
 
         });
@@ -579,12 +571,15 @@ public class MainActivity extends AppCompatActivity {
 //                break;
 //            case Configuration.ORIENTATION_UNDEFINED:
 //                break;
+            case Configuration.ORIENTATION_SQUARE:
+                break;
+            case Configuration.ORIENTATION_UNDEFINED:
+                break;
         }
     }
 
     @Override
     protected void onDestroy() {
-//        save_file(file_for_setting,"","APPEND");
         super.onDestroy();
         webView.destroy();
         webView = null;

@@ -33,26 +33,39 @@
 <!-- 备忘录 -->
 <div style="margin-bottom: 20px; margin-left: 2px; margin-right: 2px;">
     <p style="font-size: 20px;">备忘录</p>
+
     <textarea cols=1 rows=1 id="notes_for_bangumi" style="height:20%;width:100%;border: 1px pink solid; margin-bottom: 5px;" placeholder="想看的番在这记下来~"></textarea><br>
-    备忘录的高度：<input type="number" id="notes_for_test" value="20" style="width: 25px; border: none;">%
-    <input type="button" style="border: none;margin-left: 10px;"
-        onclick="h=document.getElementById('notes_for_test').value;
-                document.getElementById('notes_for_bangumi').style.height=h+'%';
-                window.localStorage.setItem('height_notes',''+h);" 
-        value="set >>"><br>
     <script>
-        h=window.localStorage.getItem('height_notes');
-        if (h){
-            document.getElementById('notes_for_bangumi').style.height=h+'%';
-            document.getElementById('notes_for_test').value=h;
+        var div1=document.getElementById('notes_for_bangumi');
+        var v1=window.localStorage.getItem('contents_notes');
+        if (v1 !== null){div1.value=v1;};
+
+        div1.onblur = function save_change(){
+            window.localStorage.setItem('contents_notes',div1.value);
+        };
+    </script>
+
+    备忘录的高度<i style="font-size: 10px;">（百分比）</i><input type="number" id="notes_for_height" value="20" style="width: 40px;">
+    <script>
+        var div2=document.getElementById('notes_for_bangumi');
+        var div3=document.getElementById('notes_for_height');
+        v2=window.localStorage.getItem('height_notes');
+        if (v2 !== null){
+            div2.style.height=v2+'%';
+            div3.value=v2;
         }
+
+        div3.onblur = function change_height(){
+            v2=div3.value;
+            window.localStorage.setItem('height_notes',v2);
+            div2.style.height=v2+'%';
+        };
     </script>
 </div>
 
 <!-- 跳op时长 -->
-<div style="margin-top: 15px; margin-bottom: 20px; margin-left: 2px; margin-right: 3px;">
-    跳op时长设定：<input type="number" id="timeSet_skipOp" value="85" style="height: 20px; width: 50px;" min="0" max="100" step="1"><br>
-    <p style="font-size: 13px;">（单位为秒）</p>
+<div style="margin-top: 15px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
+    跳op时长<i style="font-size: 10px;">（秒）</i><input type="number" id="timeSet_skipOp" value="85" style="height: 20px; width: 50px;" min="0" max="100" step="1"><br>
 </div>
 
 <!-- 播放记录 -->
@@ -60,8 +73,7 @@
     是否开启播放记录并自动跳转？
     <input type="radio" name="play_history" id="history_check_yes" >是
     <input type="radio" name="play_history" id="history_check_no" checked>否<br>
-    以及播放记录保存时间设定：<input type="number" id="play_history_during" value="10" style="height: 20px; width: 50px; margin-top: 10px;" min="0" max="100" step="1"><br>
-    <p style="font-size: 12px;">（时间单位为天，这一项请勿频繁修改）</p>
+    播放记录保存时间<i style="font-size: 10px;">（天）</i><input type="number" id="play_history_during" value="10" style="height: 20px; width: 50px; margin-top: 10px;" min="0" max="100" step="1"><br>
     
     <div id="playLog_number" style="float: left;">
         <p>当前已记录播放记录数量</p>
@@ -83,36 +95,44 @@
 </div>
 
 
-<HR color="pink"></hr>
+<hr color="pink"></hr>
 
 <!-- <script src="Settings.js"></script> -->
-<p style="font-size: 16px; margin-left: 2px;">写在后面</p>
-<i style="font-size: 14px; margin-left: 2px; margin-bottom: 5px;">欢迎使用本app~~~</i><br>
+<p style="font-size: 20px; margin-left: 2px; margin-bottom: 10px;">关于</p>
 
 <!-- 版本记录 -->
 <details style="margin-left: 2px; margin-bottom: 5px; margin-top: 10px;">
     <summary style="font-size: 14px; color: rgb(102, 204, 255);">版本记录</summary>
+    <style>
+        .date_update{
+            color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';
+        }
+    </style>
     <div id="logs_version" style="margin-bottom: 10px; font-size: 13px; margin-left: 2px; margin-right: 3px;">
+        <p>2.8: 填了一些坑，优化了设置界面</p>
+        <i class="date_update">2022.5.2</i>
         <p>2.7: <b>全屏问题</b>解决，设置的改动自动保存</p>
-        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.4.25</i>
+        <i class="date_update">2022.4.25</i>
         <p>2.6: <b>播放记录问题</b>解决，跳op真正的神~</p>
-        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.4.15</i>
+        <i class="date_update">2022.4.15</i>
         <p>2.5: 开放了<b>下载</b>功能，可以跳到浏览器下载</p>
-        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.21</i>
+        <i class="date_update">2022.1.21</i>
         <p>2.4: 新的突破：增加记录<b>播放记录</b>的功能，但经常失效…</p>
-        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.7</i>
+        <i class="date_update">2022.1.7</i>
         <p>2.3: 把跳op的按钮按钮放进来，可以调参数</p>
-        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.5</i>
+        <i class="date_update">2022.1.5</i>
         <p>2.2: 加入了备忘录框，以及别的各种乱七八糟的东西</p>
-        <i style="color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';">2022.1.3</i>
+        <i class="date_update">2022.1.3</i>
         <p>2.1: 加入了<b>设置</b>界面</p>
-        <p style="font-size: 15px; margin-bottom: 5px;">2.0: 前面各位都是lj，这位是重大突破：记录广告，<b>彻底解决广告问题</b>。这个版本才是真正的能用，能用一万年</p>
+        <p style="font-size: 14px; margin-bottom: 10px;">2.0: 前面各位都是lj，这位是重大突破：记录广告，<b>彻底解决广告问题</b>。这个版本才是真正的能用，能用一万年</p>
         
-        <p>1.n: 剩下的同样还是各种垃圾，广告一直是大问题</p>
-        <p>1.3: <b>屏蔽且删除广告</b>，这回干净了</p>
-        <p>1.2: 添加了个<b>跳op</b>按钮，偶尔的神</p>
-        <p>1.1: <b>开放了JS</b>，同时屏蔽部分广告，能用</p>
-        <p>1.0: 无JS，功能很受限，但能用</p>
+        <i>
+        <p style="color: gray;">1.n: 剩下的同样还是各种垃圾，广告一直是大问题</p>
+        <p style="color: gray;">1.3: <b>屏蔽且删除广告</b>，这回干净了</p>
+        <p style="color: gray;">1.2: 添加了个<b>跳op</b>按钮，偶尔的神</p>
+        <p style="color: gray;">1.1: <b>开放了JS</b>，同时屏蔽部分广告，能用</p>
+        <p style="color: gray;">1.0: 无JS，功能很受限，但能用</p>
+        </i>
     </div>
 </details>
 
@@ -120,22 +140,51 @@
 <details style="margin-left: 2px; margin-bottom: 5px;">
     <summary style="font-size: 14px; color: orange;">剩余问题</summary>
     <div id="problems" style="margin-bottom: 5px; font-size: 13px; margin-left: 2px; margin-right: 3px;">
-        <p>1. 有时候JS加载不出来，SSL问题？</p>
-        <p>2. 下载问题，需要专门写个下载方式，当前的有些问题</p>
-        <p>3. 自动获取更新</p>
-        <p>4. 播放器，有待改进</p>
+        <p>.. JS加载太慢了；有时候还加载不出来</p>
+        <p>.. 下载问题，需要专门写个下载方式，当前的有些问题</p>
+        <p>.. 自动获取更新</p>
+        <p>.. 播放器，有待改进</p>
+        <p>.. 全屏问题貌似没有完全解决</p>
     </div>
 </details>
 
-<p style="margin-top: 10px; margin-left: 2px; margin-bottom: 20px;">当前版本: 2.7</p>
+<p style="margin-top: 10px; margin-left: 2px; margin-bottom: 20px;">当前版本: 2.8</p>
 
 
-<HR color="pink"></hr>
+<hr color="pink"></hr>
 
-<div id="author_setting" style="margin-left: 2px; margin-top: 10px; margin-bottom: 10px; font-family:'Times New Roman','楷体';">
+
+<i style="font-size: 14px; margin-left: 2px; margin-bottom: 20px;">欢迎使用本app~~~</i>
+
+<div id="author_setting" style="margin-left: 2px; margin-top: 10px; margin-bottom: 30px; font-family:'Times New Roman','楷体';">
+    <style>
+        .download_link{
+            font-size: 15px; margin-left: 5px; margin-top: 5px; margin-bottom: 5px;
+            overflow: hidden; word-break: break-all; word-wrap: break-word;
+        }
+        a:link{color: blue;}
+        a:visited{color:blue;}
+    </style>
+
     <p style="margin-top: 5px; margin-bottom: 10px;">通过 QQ 反馈: 2634205895</p>
+
     <p>从 GitHub 获取更新：</p>
-    <p style="margin-top: 5px; margin-bottom: 5px; margin-left: 5px; overflow: hidden; word-break: break-all; word-wrap: break-word;">
-        https://github.com/ZhiWeizz/yhdmp/tree/master/release</p>
-    <p>请自行复制到浏览器查看更新~</p>
+    <u class="download_link">
+        <a href="https://github.com/ZhiWeizz/yhdmp/tree/master/release">
+            https://github.com/ZhiWeizz/yhdmp/tree/master/release
+        </a>
+    </u>
+
+    <p style="margin-top: 10px;">如果那个下载不了可以试试这个：</p>
+    <u class="download_link">
+        <a href="https://bitbucket.org/aayaya/yhdm/downloads">
+            https://bitbucket.org/aayaya/yhdm/downloads
+        </a>
+    </u>
+
+    
 </div>
+
+<p style="font-size: 15px; margin-top: 20px; margin-bottom: 5px; text-align: center; font-family:'Times New Roman'">
+    <i>yhdmp.live</i>
+</p>
