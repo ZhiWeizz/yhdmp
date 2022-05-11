@@ -45,7 +45,7 @@
         };
     </script>
 
-    备忘录的高度<i style="font-size: 10px;">（百分比）</i><input type="number" id="notes_for_height" value="20" style="width: 40px;">
+    备忘录的高度：<input type="number" id="notes_for_height" value="20" style="width: 40px;"><i style="font-size: 10px;">（百分比）</i>
     <script>
         var div2=document.getElementById('notes_for_bangumi');
         var div3=document.getElementById('notes_for_height');
@@ -65,7 +65,7 @@
 
 <!-- 跳op时长 -->
 <div style="margin-top: 15px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
-    跳op时长<i style="font-size: 10px;">（秒）</i><input type="number" id="timeSet_skipOp" value="85" style="height: 20px; width: 50px;" min="0" max="100" step="1"><br>
+    跳op时长：<input type="number" id="timeSet_skipOp" value="85" style="height: 20px; width: 50px;" min="0" max="100" step="1"><i style="font-size: 10px;">（秒）</i><br>
 </div>
 
 <!-- 播放记录 -->
@@ -73,9 +73,9 @@
     是否开启播放记录并自动跳转？
     <input type="radio" name="play_history" id="history_check_yes" >是
     <input type="radio" name="play_history" id="history_check_no" checked>否<br>
-    播放记录保存时间<i style="font-size: 10px;">（天）</i><input type="number" id="play_history_during" value="10" style="height: 20px; width: 50px; margin-top: 10px;" min="0" max="100" step="1"><br>
+    播放记录保存时间：<input type="number" id="play_history_during" value="10" style="height: 20px; width: 50px; margin-top: 10px;" min="0" max="100" step="1"><i style="font-size: 10px;">（天）</i><br>
     
-    <div id="playLog_number" style="float: left;">
+    <div id="playLog_number" style="float: left; margin-top: 5px;">
         <p>当前已记录播放记录数量</p>
     </div>
     <div id="playLog_number_next" style="float: right;">
@@ -84,14 +84,13 @@
 </div><br>
 
 <!-- 广告信息 -->
-<div id="ad_setting" style="margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
+<div id="ad_setting" style="margin-top: 10px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
     <div id="ad_p1" style="float: left">
         <p>当前已屏蔽广告数量</p>
     </div>
     <details id="ad_p2" style="font-size: 13px;">
         <summary id="ad_p2_summary">具体有：</summary>
     </details>
-
 </div>
 
 
