@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,8 +73,18 @@ public class MainActivity extends AppCompatActivity {
     String bangumi_url;
     JSONObject playLog_json = new JSONObject();                   // 存放所有播放记录
 
+    // JS
+    private String js_del_ad    = "";
+    private String js_set_icon  = "";
+    private String js_show_info = "";
+    private String js_show_set  = "";
+    private String js_skip_op   = "";
+
     // 通信的
     private final receiver_main receiverMain = new receiver_main();
+
+
+    // 正文
     @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,11 +222,25 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDomStorageEnabled(true); //我靠这一行打开就放开了广告，但是关掉有些不能看了
 
 
+        // JS字符
+        Log.d("zhiwei","load js string");
+        try {
+            js_del_ad    = read_file_local("JS/del_ad.js");
+            js_set_icon  = read_file_local("JS/set_icon.js");
+            js_show_info = read_file_local("JS/show_info.js");
+            js_show_set  = read_file_local("JS/show_set.js");
+            js_skip_op   = read_file_local("JS/skip_op.js");
+            Log.d("zhiwei","load js successfully");
+        } catch (Exception e) {
+            Log.d("zhiwei","files not found");
+            e.printStackTrace();
+        }
+
         // JS与Java的交互
         webView.addJavascriptInterface(new js_interface(this), "Settings");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("broadcast of yhdm");
-        registerReceiver(receiverMain,intentFilter);
+        LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(receiverMain, intentFilter);
 
         // 下载功能
         webView.setDownloadListener(new MyWebViewDownLoadListener());
@@ -225,7 +250,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // 判断url链接中是否含有某个字段，如果有就执行指定的跳转（不执行跳转url链接），如果没有就加载url链接
-                return !url.contains("yhdmp");
+//                return !url.contains("yhdmp");
+                if (url.contains("github.com") | url.contains("bitbucket.org")){
+                    Uri uri = Uri.parse(url);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    startActivity(intent);
+                    return true;
+                }else {
+                    return !url.contains("yhdmp");
+                }
             }
 
             // 隐藏广告，后面通过js来删除广告
@@ -260,12 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 //                 删除广告的js，顺便储存广告。第一优先级  div1
-                webView.evaluateJavascript("javascript:"
-                        + "if (document.getElementById('author_setting')===null){"
-                        + "var div1=document.getElementsByTagName('style');"
-                        +"div1[div1.length-1].nextElementSibling.click();" // 先删
-                        + "var returnValue=div1[div1.length-1].innerHTML;" // 后存
-                        + "(function myFunction(value) {return value;})(returnValue);};", new ValueCallback<String>() {
+                webView.evaluateJavascript("javascript:" + js_del_ad, new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String value) {
                         if (value.length()>10) {
@@ -285,57 +313,25 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 // 设置图标的js，放后面      div_head, btn_setting
-                webView.loadUrl("javascript:"
-                                +"var div_head=document.getElementsByClassName('nav fr')[0];"
-                                +"div_head.removeChild(document.getElementById('nav_fr_to_pc'));"
-                                +"let btn_setting = document.createElement('button');"
-                                +"btn_setting.style=\"position:absolute;right:88px;background-color:transparent;color:#FFFFFF;border:2.4px solid white;border-radius:50%;display:right;height:23px;width:23px;margin-top:10px;text-align:center;font-family:Consolas;font-weight:bold;\";"
-                                +"btn_setting.textContent='S';"
-                                +"btn_setting.title='设置';"
-                                +"div_head.insertBefore(btn_setting,div_head.childNodes[0]);"
-
-                                +"btn_setting.onclick=function(){"
-                                +"btn_setting.style.border='2.4px solid #66ccff';"
-                                +"Settings.load_settings();};"
-                );
-
+                webView.loadUrl("javascript:" + js_set_icon);
 
                 // 显示广告，和播放记录数量：
-                webView.loadUrl("javascript:"
-                        +"var div_ad=document.getElementById('ad_setting');"
-                        +"if (div_ad) {"
-                        +"var div_ad_p2=document.getElementById('ad_p2');"
-                        +"var div_ad_p2_summary=document.getElementById('ad_p2_summary');"
-                        +"let div_ad_number=document.createElement('div');"
-                        +"div_ad_number.innerHTML='<p>："+adUrls.length+"</p>';"
-                        +"div_ad.insertBefore(div_ad_number,div_ad_p2);"
-
-                        +"let div_ad_details=document.createElement('div');"
-                        +"div_ad_details.innerHTML='<p>"+list_join(", ",adUrls)+"</p>';"
-                        +"div_ad_details.style=\"font-size:12px\";"
-                        +"div_ad_p2.insertBefore(div_ad_details,div_ad_p2_summary.nextElementSibling);"
-
-                        +"var playLog_number=document.createElement('div');"
-                        +"playLog_number.innerHTML='<p>："+playLog_json.length()+"</p>';"
-                        +"playLog_number.style='float:left';"
-                        +"var playLog_div=document.getElementById('playLog');"
-                        +"var playLog_number_div=document.getElementById('playLog_number_next');"
-                        +"playLog_div.insertBefore(playLog_number,playLog_number_div);"
-
-                        +"var clear_logs=document.getElementById('clear_logs');"
-                        +"clear_logs.onclick=function(){"
-                        +"if (confirm('确认清空记录？')){Settings.clear_logs();playLog_number.innerHTML='<p>：0</p>';};};"
-                        +"};"
-                );
+                webView.loadUrl("javascript:" + String.format(js_show_info, adUrls.length, list_join(", ",adUrls), playLog_json.length() ) );
 
                 // 显示或者保存设置
+                String p2="";
                 String p3="";
                 String p4="";
                 String p5="";
                 try {
+                    p2=settings_json.getString(properties[1]);
                     p3=settings_json.getString(properties[2]);
                     p4=settings_json.getString(properties[3]);
                     p5=settings_json.getString(properties[4]);
+
+                    if (p2.length()==0 | p2.length()>10) {
+                        p2 = "true";
+                    }
                     if (p3.length()>0) {
                         timeSet_skipOp=Float.parseFloat(p3);
                     }else {
@@ -354,109 +350,11 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException ignored) {}
 
                 // 显示设置         div1s, div2s, div3s, div_saveSet, p1,p2,p3,strings
-                webView.loadUrl("javascript:"
-                    +"if (document.getElementById('author_setting')){"
-                        +"var div3s=document.getElementById('timeSet_skipOp');"
-                        +"div3s.value="+timeSet_skipOp+";"
-                        +"var div4y=document.getElementById('history_check_yes');"
-                        +"var div4n=document.getElementById('history_check_no');"
-                        +"if ("+is_log_play_history+"){div4y.checked=true;}"
-                        +"else {div4n.checked=true;};"
-                        +"var div5s=document.getElementById('play_history_during');"
-                        +"div5s.value="+during_history+";"
-
-                        +"var settings_temp='nth';"
-                        +"function save_settings(){"
-                            +"var p1='has_been_aborted';"
-                            +"var p2='has_been_aborted';"
-                            +"var p3=div3s.value;"
-                            +"var p4=div4y.checked;"
-                            +"var p5=div5s.value;"
-                            +"var settings_new= '{' + 'p1:' +'\"'+p1+'\"'  +',p2:'+'\"'+p2+'\"'  +',p3:'+'\"'+p3+'\"' +',p4:'+'\"'+p4+'\"' +',p5:'+'\"'+p5+'\"' +'}';"
-                            +"if (settings_temp != settings_new){Settings.save_settings(settings_new);};"
-                            +"settings_temp = settings_new;"
-                        +"}"
-                    +"setInterval(save_settings, 200);}"
-                );
-
-                // 私货js，防止骚扰加个小概率，放在最后      new1, new2
-                webView.loadUrl("javascript:if (Math.random()<0.1){"
-                        +"if (document.getElementById('author_setting')===null){"
-                        +"var new1=document.getElementsByTagName('a');"
-                        +"let new2=document.createElement('div');"
-                        +"new2.innerHTML=\"<p style='color:gray;font-size:15px;font-family:\'Times New Roman\',\'楷体\';'>如有问题请及时反馈给：写这个app的伟人：QQ: 2634205895</p>\";"
-                        +"document.getElementsByTagName('body')[0].insertBefore(new2,new1[new1.length-1]);}}"
-                );
+                webView.loadUrl("javascript:" + String.format(js_show_set, p2,Math.round(timeSet_skipOp),is_log_play_history,Math.round(during_history)));
 
                 // 跳op的js，放在最后      btn_op, div1o, div3o, div4o, y, time_current, time_log, msg, v1, v2, v3, viDeo
-                webView.loadUrl("javascript:"
-                        +"var div4o=document.getElementsByClassName('fav fr');"
-                        +"let btn_op = document.createElement('button');"
-                        +"btn_op.innerHTML='跳op';btn_op.id='skip_op';"
-                        +"var div6o=document.getElementsByClassName('playbg');"
-                        +"div6o[0].insertBefore(btn_op,div4o[0]);"
+                webView.loadUrl("javascript:" + String.format(js_skip_op, p2,timeSet_skipOp,can_skip,skip_time,bangumi_url,days_today,is_log_play_history));
 
-                        +"$(function(){"
-                            +"var div1o=document.getElementsByTagName('iframe');"
-                            +"var y=(div1o[0].contentWindow || div1o[0].contentDocument);if (y.document)y=y.document;"
-                            +"var div3o=y.getElementsByTagName('video');"
-
-                            // 获取视频
-                            +"function getVideo(){"
-                                +"var v1=document.getElementsByTagName('iframe');"
-                                +"var v2=(v1[0].contentWindow || v1[0].contentDocument);if (v2.document)v2=v2.document;"
-                                +"var v3=v2.getElementsByTagName('video');"
-                                +"return v3[0];"
-                            +"};"
-
-                            // 跳op
-                            +"btn_op.onclick=function(){"
-                            +"Settings.print('skip op');"
-                            +"getVideo().currentTime+="+timeSet_skipOp+";};"
-
-//                          // 启动监听的函数
-                                +"function listen(){"
-                                +"Settings.print('allow to log');"
-                                +"var time_log=0;"
-                                +"let time_show_div = document.createElement('input');"
-                                +"time_show_div.type='text';time_show_div.style='width:40px; margin-left:15px; margin-right:5px; color:gray; border:none;';"
-                                +"time_show_div.value='0:00';"
-                                +"div6o[0].insertBefore(time_show_div,div4o[0]);"
-                                +"var viDeo=getVideo();"
-
-                                +"if ("+can_skip+"){"       // 因为优化了，所以不需要按钮，劳资nb
-                                +"Settings.print('can skip');"
-                                +"viDeo.currentTime="+skip_time+";"
-                                +"};"
-
-                                +"viDeo.addEventListener('timeupdate',function(){"
-                                    +"var time_current=Math.ceil(this.currentTime)-1;"  // -1修正
-                                    +"if (time_current-time_log>=1 || time_current-time_log<-1){"
-                                    +"time_log=parseInt(time_current);"
-
-                                    +"var tail=time_log % 60;if (tail<10){tail='0'+tail;};"
-                                    +"if (time_log>=3600){var time_show=parseInt(time_log/3600)+':'+parseInt((time_log % 3600)/60)+':'+tail;}"
-                                    +"else{var time_show=parseInt(time_log/60)+':'+tail;};"
-                                    +"time_show_div.value=time_show;"
-
-                                    +"var msg='{'+"+ "'\""+bangumi_url+"\"'" +"+':\"'+"+ "'"+days_today+"'" +"+','+time_log" +"+'\"}';"
-                                    +"Settings.show_time_play(msg);};"
-                                +"});"
-
-                                +"Settings.print('load successfully');"
-                            +"};"
-
-                            // 新的延迟sleep方式
-                            +"if ("+is_log_play_history+"){"
-                            +"var times_for_load = 1000;"
-                            +"var interval = setInterval(function(){"
-                            +"if (getVideo() || times_for_load <0){"
-                            +"clearInterval(interval);"
-                            +"listen();} else{times_for_load = times_for_load -1;};"
-                            +"}, 100);};"
-
-                        +"});"
-                );
 
                 Log.d("zhiwei","page finish");
 
@@ -627,6 +525,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private String read_file_local(String filename) throws IOException {
+        BufferedReader reader = null;
+        StringBuilder content = new StringBuilder();
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open(filename)));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                content.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return content.toString();
+
+    }
+
     // 新的读取文件方式
     private String read_file(String filename) throws IOException {
         FileInputStream in = null;
@@ -664,14 +587,14 @@ public class MainActivity extends AppCompatActivity {
 
     // 拼接字符串数组，类似python的.join方法
     private String list_join(String a,String[] A) {
-        String result="";
+        StringBuilder result= new StringBuilder();
         if (A.length>1){
             for (int i=0;i<A.length-1;i++){
-                result+=A[i]+a;
+                result.append(A[i]).append(a);
             }
         }
-        result+=A[A.length-1];
-        return result;
+        result.append(A[A.length - 1]);
+        return result.toString();
     }
 
 }
@@ -683,14 +606,13 @@ class js_interface {
     public js_interface(Context context){
         this.context=context;
     }
-    private float time_log;
 
     // 设置界面
     @JavascriptInterface
     public void load_settings() {
         Intent intent = new Intent("broadcast of yhdm");
         intent.putExtra("type","reload_settings");
-        context.sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     // 保存设置
@@ -699,7 +621,7 @@ class js_interface {
         Intent intent = new Intent("broadcast of yhdm");
         intent.putExtra("type","save_settings");
         intent.putExtra("data",strings);
-        context.sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     // 记录视频播放时间
@@ -709,7 +631,7 @@ class js_interface {
         Intent intent = new Intent("broadcast of yhdm");
         intent.putExtra("type","update_play_logs");
         intent.putExtra("data",msg);
-        context.sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     // 记录视频播放时间
@@ -724,7 +646,7 @@ class js_interface {
         Log.d("zhiwei","clear logs");
         Intent intent = new Intent("broadcast of yhdm");
         intent.putExtra("type","clear_logs");
-        context.sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 }

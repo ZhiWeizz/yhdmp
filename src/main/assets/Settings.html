@@ -24,17 +24,57 @@
 <!-- 以下是需要慢慢补充改进的： -->
 
 
-<!-- 下面是一些功能性设置 -->
-<div id="head_setting" style="margin-bottom: 20px; margin-left: 2px; margin-right: 3px;">
-    <p style="font-size: 25px; margin-bottom: 10px; margin-top: 5px;">设置</p>
-    <p>下面你可以设置这个app的一些东西</p>
+<!-- 头部选择框 -->
+<div>
+    <style>
+        .select_button_on{
+            font-size: 18px;
+            width: 20%; height: 40px;
+            margin-left: 15%; margin-right: 15%;
+            background-color: white;
+            border: none; border-bottom: 2px solid pink;
+        }
+        .select_button_off{
+            font-size: 18px;
+            width: 20%; height: 40px;
+            margin-left: 15%; margin-right: 15%;
+            background-color: white;
+            border: none;
+        }
+    </style>
+
+    <button id="select_btn_set"   class="select_button_on" style="float: left;" >设置</button>
+    <button id="select_btn_about" class="select_button_off" style="float: right;">关于</button>
+
+    <script>
+        document.getElementById('select_btn_set').onclick=function(){
+            console.log('转到 设置');
+            document.getElementById('select_btn_set').className='select_button_on';
+            document.getElementById('select_btn_about').className='select_button_off';
+            
+            document.getElementById('Settings').style.display='block';
+            document.getElementById('Abouts').style.display='none';
+        }
+
+        document.getElementById('select_btn_about').onclick=function(){
+            console.log('转到 关于');
+            document.getElementById('select_btn_set').className='select_button_off';
+            document.getElementById('select_btn_about').className='select_button_on';
+
+            document.getElementById('Settings').style.display='none';
+            document.getElementById('Abouts').style.display='block';
+        }
+    </script>
 </div>
+<hr color="pink"></hr>
+
 
 <!-- 备忘录 -->
+<div id="Settings" style="display: block;">
 <div style="margin-bottom: 20px; margin-left: 2px; margin-right: 2px;">
-    <p style="font-size: 20px;">备忘录</p>
+    <p style="font-size: 20px; text-align: center;">备忘录</p>
 
-    <textarea cols=1 rows=1 id="notes_for_bangumi" style="height:20%;width:100%;border: 1px pink solid; margin-bottom: 5px;" placeholder="想看的番在这记下来~"></textarea><br>
+    <textarea cols=1 rows=1 id="notes_for_bangumi" style="height:20%; width:98%; border: 1px pink solid; margin-bottom: 5px; margin-left: 1%;" placeholder="想看的番在这记下来~"></textarea><br>
     <script>
         var div1=document.getElementById('notes_for_bangumi');
         var v1=window.localStorage.getItem('contents_notes');
@@ -45,7 +85,8 @@
         };
     </script>
 
-    备忘录的高度：<input type="number" id="notes_for_height" value="20" style="width: 40px;"><i style="font-size: 10px;">（百分比）</i>
+    <p style="float: left; margin-left: 1%;">备忘录的长度<i style="font-size: 10px;">（百分比）</i>：</p>
+    <input type="number" id="notes_for_height" value="20" style="width: 50px; float: right; margin-right: 35%;"><br>
     <script>
         var div2=document.getElementById('notes_for_bangumi');
         var div3=document.getElementById('notes_for_height');
@@ -64,50 +105,64 @@
 </div>
 
 <!-- 跳op时长 -->
-<div style="margin-top: 15px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
-    跳op时长：<input type="number" id="timeSet_skipOp" value="85" style="height: 20px; width: 50px;" min="0" max="100" step="1"><i style="font-size: 10px;">（秒）</i><br>
-</div>
+<div style="margin-top: 50px; margin-left: 2px; margin-right: 3px;">
+    <p style="float: left; margin-left: 3px;">跳op时长<i style="font-size: 10px;">（秒）</i>：</p>
+    <input type="number" id="timeSet_skipOp" value="85" style="width: 50px; margin-right: 35%; float: right;"><br><br>
 
-<!-- 播放记录 -->
-<div id="playLog" style="margin-top: 5px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
-    是否开启播放记录并自动跳转？
-    <input type="radio" name="play_history" id="history_check_yes" >是
-    <input type="radio" name="play_history" id="history_check_no" checked>否<br>
-    播放记录保存时间：<input type="number" id="play_history_during" value="10" style="height: 20px; width: 50px; margin-top: 10px;" min="0" max="100" step="1"><i style="font-size: 10px;">（天）</i><br>
-    
-    <div id="playLog_number" style="float: left; margin-top: 5px;">
-        <p>当前已记录播放记录数量</p>
-    </div>
-    <div id="playLog_number_next" style="float: right;">
-        <input type="submit" value="清空记录" id="clear_logs">
+    <p style="float: left;">按钮位置：</p>
+    <div style="float: right; margin-right: 30%;">
+        <input type="radio" name="skipop_loc" id="skipop_left" checked>左
+        <input type="radio" name="skipop_loc" id="skipop_right">右
     </div>
 </div><br>
 
+<!-- 播放记录 -->
+<div id="playLog" style="margin-top: 50px; margin-left: 2px; margin-right: 3px;">
+    <p style="float: left;">是否开启播放记录：</p>
+    <div style="float: right; margin-right: 30%;">
+        <input type="radio" name="play_history" id="history_check_yes" >是
+        <input type="radio" name="play_history" id="history_check_no" checked>否<br>
+    </div><br><br>
+
+    <p style="float: left;">播放记录保存时间<i style="font-size: 10px;">（天）</i>：</p>
+    <input type="number" id="play_history_during" value="10" style="width: 50px; float: right; margin-right: 35%;"><br><br>
+    
+    <div id="playLog_number">
+        <p style="float: left;">播放记录数量</p>
+    </div>
+    <div id="playLog_number_next" style="float: right; margin-right: 31%; ">
+        <input type="submit" value="清空记录" id="clear_logs">
+    </div><br>
+</div>
+
 <!-- 广告信息 -->
-<div id="ad_setting" style="margin-top: 10px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
-    <div id="ad_p1" style="float: left">
-        <p>当前已屏蔽广告数量</p>
+<div id="ad_setting" style="margin-top: 60px; margin-bottom: 30px; margin-left: 2px; margin-right: 3px;">
+    <div id="ad_p1" >
+        <p style="float: left">当前已屏蔽广告数量</p>
     </div>
     <details id="ad_p2" style="font-size: 13px;">
-        <summary id="ad_p2_summary">具体有：</summary>
+        <summary id="ad_p2_summary" >具体有：</summary>
     </details>
 </div>
 
+</div>
 
-<hr color="pink"></hr>
 
 <!-- <script src="Settings.js"></script> -->
-<p style="font-size: 20px; margin-left: 2px; margin-bottom: 10px;">关于</p>
+<div id="Abouts" style="display: none;">
+<p style="font-size: 20px; margin-left: 2px; margin-bottom: 10px; text-align: center;">关于</p>
 
 <!-- 版本记录 -->
 <details style="margin-left: 2px; margin-bottom: 5px; margin-top: 10px;">
-    <summary style="font-size: 14px; color: rgb(102, 204, 255);">版本记录</summary>
+    <summary style="font-size: 16px; color: rgb(102, 204, 255); margin-left: 5px;">版本记录</summary>
     <style>
         .date_update{
             color: gray; font-size: 12px; margin-left: 3px; font-family:'Times New Roman';
         }
     </style>
     <div id="logs_version" style="margin-bottom: 10px; font-size: 13px; margin-left: 2px; margin-right: 3px;">
+        <p>2.9: 继续填坑…</p>
+        <i class="date_update">2022.5.18</i>
         <p>2.8: 填了一些坑，优化了设置界面</p>
         <i class="date_update">2022.5.2</i>
         <p>2.7: <b>全屏问题</b>解决，设置的改动自动保存</p>
@@ -137,28 +192,28 @@
 
 <!-- 剩余问题 -->
 <details style="margin-left: 2px; margin-bottom: 5px;">
-    <summary style="font-size: 14px; color: orange;">剩余问题</summary>
+    <summary style="font-size: 16px; color: orange; margin-left: 5px;">剩余问题</summary>
     <div id="problems" style="margin-bottom: 5px; font-size: 13px; margin-left: 2px; margin-right: 3px;">
         <p>.. JS加载太慢了；有时候还加载不出来</p>
         <p>.. 下载问题，需要专门写个下载方式，当前的有些问题</p>
         <p>.. 自动获取更新</p>
         <p>.. 播放器，有待改进</p>
-        <p>.. 全屏问题貌似没有完全解决</p>
+        <p>.. 全屏貌似偶尔会有问题</p>
     </div>
 </details>
 
-<p style="margin-top: 10px; margin-left: 2px; margin-bottom: 20px;">当前版本: 2.8</p>
+<p style="margin-top: 20px; margin-left: 5px; margin-bottom: 50px;">当前版本: 2.9</p>
 
 
-<hr color="pink"></hr>
+<!-- <hr color="pink" style="border: 1px, dashed"></hr> -->
+<hr style= "border:1px dashed pink" />
 
 
 <i style="font-size: 14px; margin-left: 2px; margin-bottom: 20px;">欢迎使用本app~~~</i>
-
 <div id="author_setting" style="margin-left: 2px; margin-top: 10px; margin-bottom: 30px; font-family:'Times New Roman','楷体';">
     <style>
         .download_link{
-            font-size: 15px; margin-left: 5px; margin-top: 5px; margin-bottom: 5px;
+            font-size: 14px; margin-left: 5px; margin-top: 5px; margin-bottom: 5px;
             overflow: hidden; word-break: break-all; word-wrap: break-word;
         }
         a:link{color: blue;}
@@ -180,10 +235,11 @@
             https://bitbucket.org/aayaya/yhdm/downloads
         </a>
     </u>
-
-    
 </div>
 
-<p style="font-size: 15px; margin-top: 20px; margin-bottom: 5px; text-align: center; font-family:'Times New Roman'">
+</div>
+
+
+<p style="font-size: 15px; margin-top: 50px; margin-bottom: 5px; text-align: center; font-family:'Times New Roman'">
     <i>yhdmp.live</i>
 </p>
