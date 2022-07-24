@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     private static WebView webView;
     private FrameLayout mLayout;
+    private String fix_rotate_screen = "true";  // 是否横竖幕锁定
 
 
     // 广告的
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     final String file_for_ad="adurls.txt";
 
     // 设置的
-    private final String[] properties = {"notes1_aborted","note2_aborted","timeSet_skipOp","is_log_play_history","during_history"};
+    private final String[] properties = {"notes1_aborted","note2_aborted","timeSet_skipOp","is_log_play_history","during_history","rotate_screen_bool"};
     private final JSONObject settings_json = new JSONObject();
     final String file_for_setting="settings_contents.txt";
     float timeSet_skipOp = 86; // 跳op的时间
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     private String js_show_info = "";
     private String js_show_set  = "";
     private String js_skip_op   = "";
+    private String js_listen_load = "";
 
     // 通信的
     private final receiver_main receiverMain = new receiver_main();
@@ -230,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
             js_show_info = read_file_local("JS/show_info.js");
             js_show_set  = read_file_local("JS/show_set.js");
             js_skip_op   = read_file_local("JS/skip_op.js");
+            js_listen_load  = read_file_local("JS/listen_load.js");
             Log.d("zhiwei","load js successfully");
         } catch (Exception e) {
             Log.d("zhiwei","files not found");
@@ -261,6 +265,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            // 阻塞图片加载，加速JS执行；加载监听js
+            @Override
+            public void onPageStarted(WebView webView, String url, Bitmap favicon){
+                super.onPageStarted(webView, url, favicon);
+                webView.getSettings().setBlockNetworkImage(true);
+                Log.d("zhiwei","Block images");
+                webView.loadUrl("javascript:"+js_listen_load);
+                Log.d("zhiwei","load js to listen");
+            }
+
             // 隐藏广告，后面通过js来删除广告
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
@@ -271,94 +285,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            // js，操作一些东西
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-
-                bangumi_url = null;
-                can_skip = "false";
-                if (url.contains("vp/") & url.contains(".html")){
-                    bangumi_url=url.substring(url.indexOf("vp/")+3,url.indexOf(".html"));
-                }
-
-                if (playLog_json.has(bangumi_url)){
-                    can_skip = "true";
-                    try {
-                        String temp_time = playLog_json.getString(bangumi_url);
-                        skip_time = temp_time.substring(temp_time.indexOf(",")+1);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-//                 删除广告的js，顺便储存广告。第一优先级  div1
-                webView.evaluateJavascript("javascript:" + js_del_ad, new ValueCallback<String>() {
-                    @Override
-                    public void onReceiveValue(String value) {
-                        if (value.length()>10) {
-                            String res = value.split("\\.")[1];
-
-                            if (!Arrays.asList(adUrls).contains(res)){
-                                // 此处修改，目标为res
-
-                                adUrls=new_strs(adUrls,new String[] {res});
-                                Toast.makeText(getApplicationContext(),"记录广告："+res,Toast.LENGTH_SHORT).show();
-
-                                save_file(file_for_ad,res+",","APPEND");
-                                webView.reload();
-                            }
-                        }
-                    }
-                });
-
-                // 设置图标的js，放后面      div_head, btn_setting
-                webView.loadUrl("javascript:" + js_set_icon);
-
-                // 显示广告，和播放记录数量：
-                webView.loadUrl("javascript:" + String.format(js_show_info, adUrls.length, list_join(", ",adUrls), playLog_json.length() ) );
-
-                // 显示或者保存设置
-                String p2="";
-                String p3="";
-                String p4="";
-                String p5="";
-                try {
-                    p2=settings_json.getString(properties[1]);
-                    p3=settings_json.getString(properties[2]);
-                    p4=settings_json.getString(properties[3]);
-                    p5=settings_json.getString(properties[4]);
-
-                    if (p2.length()==0 | p2.length()>10) {
-                        p2 = "true";
-                    }
-                    if (p3.length()>0) {
-                        timeSet_skipOp=Float.parseFloat(p3);
-                    }else {
-                        timeSet_skipOp=1;
-                    }
-                    if (p4.length()>0) {
-                        is_log_play_history = p4;
-                    }else {
-                        is_log_play_history = "true";
-                    }
-                    if (p5.length()>0) {
-                        during_history=Float.parseFloat(p5);
-                    }else {
-                        during_history=10;
-                    }
-                } catch (JSONException ignored) {}
-
-                // 显示设置         div1s, div2s, div3s, div_saveSet, p1,p2,p3,strings
-                webView.loadUrl("javascript:" + String.format(js_show_set, p2,Math.round(timeSet_skipOp),is_log_play_history,Math.round(during_history)));
-
-                // 跳op的js，放在最后      btn_op, div1o, div3o, div4o, y, time_current, time_log, msg, v1, v2, v3, viDeo
-                webView.loadUrl("javascript:" + String.format(js_skip_op, p2,timeSet_skipOp,can_skip,skip_time,bangumi_url,days_today,is_log_play_history));
-
-
-                Log.d("zhiwei","page finish");
-
-            }
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
@@ -370,6 +296,11 @@ public class MainActivity extends AppCompatActivity {
                 mLayout.setVisibility(View.VISIBLE);
                 mLayout.bringToFront();
                 parent.removeView(webView);
+
+                if (fix_rotate_screen.equals("true")) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    Log.d("full_screen", "进入横屏");
+                }
                 super.onShowCustomView(view, callback);
             }
 
@@ -379,6 +310,11 @@ public class MainActivity extends AppCompatActivity {
                 parent.addView(webView);
                 mLayout.removeAllViews();
                 mLayout.setVisibility(View.GONE);
+
+                if (fix_rotate_screen.equals("true")) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    Log.d("full_screen", "进入竖屏");
+                }
                 super.onHideCustomView();
             }
 
@@ -409,44 +345,159 @@ public class MainActivity extends AppCompatActivity {
             // 根据不同类型消息执行动作
 
             // 加载设置界面
-            if (type.equals("reload_settings")){
-                webView.loadUrl("file:///android_asset/Settings.html");
-                Log.d("zhiwei","reload settings");}
+            switch (type) {
 
-            // 更改设置
-            else if (type.equals("save_settings")){
-                String data = intent.getStringExtra("data");
-                Log.d("zhiwei",data);
+                case "load_js_img":{
+//                  删除广告的js，顺便储存广告。
+                    // del_ad.js
+                    webView.evaluateJavascript("javascript:" + js_del_ad, new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String value) {
+                            if (value.length()>10) {
+                                String res = value.split("\\.")[1];
+                                Log.d("zhiwei", "Ad: "+res);
 
-                try {
-                    JSONObject newsettings = new JSONObject(data);
-                    for (int i=0;i<properties.length;i++){
-                        settings_json.put(properties[i],newsettings.getString("p"+(i+1)));
+                                if (!Arrays.asList(adUrls).contains(res) & res.length()>0 & res.length()<20){
+                                    Log.d("zhiwei","new ad:"+res);
+                                    // 此处修改，目标为res
+                                    adUrls=new_strs(adUrls,new String[] {res});
+                                    Toast.makeText(getApplicationContext(),"记录广告："+res,Toast.LENGTH_SHORT).show();
+
+                                    save_file(file_for_ad,res+",","APPEND");
+                                }
+                            }
+                        }
+                    });
+
+                    break;
+                }
+
+                // dom加载完成之后操作的js
+                case "load_js_dom":{
+                    webView.getSettings().setBlockNetworkImage(false);
+                    Log.d("zhiwei","open loading images");
+                    String url = intent.getStringExtra("data");
+
+                    bangumi_url = null;
+                    can_skip = "false";
+                    if (url.contains("vp/") & url.contains(".html")){
+                        bangumi_url=url.substring(url.indexOf("vp/")+3,url.indexOf(".html"));
                     }
-                    save_file(file_for_setting,settings_json.toString(),"PRIVATE");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
 
-            // 播放记录
-            else if (type.equals("update_play_logs")){
-                String data = intent.getStringExtra("data");
-                String name = data.substring(2,data.indexOf(":")-1);
-                String value= data.substring(data.indexOf(":")+2,data.indexOf("}")-1);
-                save_file(file_for_playLog,data+"playLog","APPEND");
-                try {
-                    playLog_json.put(name,value);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+                    if (playLog_json.has(bangumi_url)){
+                        can_skip = "true";
+                        try {
+                            String temp_time = playLog_json.getString(bangumi_url);
+                            skip_time = temp_time.substring(temp_time.indexOf(",")+1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-            // 清空播放记录
-            else if (type.equals("clear_logs")){
-                playLog_json = new JSONObject();
-                save_file(file_for_playLog,"","PRIVATE");
-                Toast.makeText(getApplicationContext(),"清空了播放记录",Toast.LENGTH_SHORT).show();
+                    // 设置图标的js，放后面      div_head, btn_setting
+                    webView.loadUrl("javascript:" + js_set_icon);
+
+                    // 显示广告，和播放记录数量：
+                    webView.loadUrl("javascript:" + String.format(js_show_info, adUrls.length, list_join(", ",adUrls), playLog_json.length() ) );
+
+                    // 显示或者保存设置
+                    String p2="";
+                    String p3="";
+                    String p4="";
+                    String p5="";
+                    String p6="";
+                    try {
+                        p2=settings_json.getString(properties[1]);
+                        p3=settings_json.getString(properties[2]);
+                        p4=settings_json.getString(properties[3]);
+                        p5=settings_json.getString(properties[4]);
+                        p6=settings_json.getString(properties[5]);
+
+                        if (p2.length()==0 | p2.length()>10) {
+                            p2 = "true";
+                        }
+                        if (p3.length()>0) {
+                            timeSet_skipOp=Float.parseFloat(p3);
+                        }else {
+                            timeSet_skipOp=1;
+                        }
+                        if (p4.length()>0) {
+                            is_log_play_history = p4;
+                        }else {
+                            is_log_play_history = "true";
+                        }
+                        if (p5.length()>0) {
+                            during_history=Float.parseFloat(p5);
+                        }else {
+                            during_history=10;
+                        }
+                        if (p6.length()>0) {
+                            fix_rotate_screen= p6;
+                        }else {
+                            fix_rotate_screen= "true";
+                        }
+                    } catch (JSONException ignored) {}
+
+                    if (fix_rotate_screen.equals("false")){
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);    // 屏幕方向随系统
+                    }else {
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // 固定竖屏
+                    }
+
+                    // 显示设置         div1s, div2s, div3s, div_saveSet, p1,p2,p3,strings
+                    webView.loadUrl("javascript:" + String.format(js_show_set, p2,Math.round(timeSet_skipOp),is_log_play_history,Math.round(during_history),fix_rotate_screen));
+
+                    // 跳op的js，放在最后      btn_op, div1o, div3o, div4o, y, time_current, time_log, msg, v1, v2, v3, viDeo
+                    webView.loadUrl("javascript:" + String.format(js_skip_op, p2,timeSet_skipOp,can_skip,skip_time,bangumi_url,days_today,is_log_play_history));
+
+                    Log.d("zhiwei","page finish");
+
+                    break;
+                }
+
+                // 加载设置
+                case "reload_settings":
+                    webView.loadUrl("file:///android_asset/Settings.html");
+                    Log.d("zhiwei", "reload settings");
+                    break;
+
+                // 更改设置
+                case "save_settings": {
+                    String data = intent.getStringExtra("data");
+                    Log.d("zhiwei", data);
+
+                    try {
+                        JSONObject newsettings = new JSONObject(data);
+                        for (int i = 0; i < properties.length; i++) {
+                            settings_json.put(properties[i], newsettings.getString("p" + (i + 1)));
+                        }
+                        save_file(file_for_setting, settings_json.toString(), "PRIVATE");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+
+                // 播放记录
+                case "update_play_logs": {
+                    String data = intent.getStringExtra("data");
+                    String name = data.substring(2, data.indexOf(":") - 1);
+                    String value = data.substring(data.indexOf(":") + 2, data.indexOf("}") - 1);
+                    save_file(file_for_playLog, data + "playLog", "APPEND");
+                    try {
+                        playLog_json.put(name, value);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+
+                // 清空播放记录
+                case "clear_logs":
+                    playLog_json = new JSONObject();
+                    save_file(file_for_playLog, "", "PRIVATE");
+                    Toast.makeText(getApplicationContext(), "清空了播放记录", Toast.LENGTH_SHORT).show();
+                    break;
             }
 
         }
@@ -647,6 +698,38 @@ class js_interface {
         Intent intent = new Intent("broadcast of yhdm");
         intent.putExtra("type","clear_logs");
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    // 加载JS
+    @JavascriptInterface
+    public void load_js_dom(String  msg) {
+        Log.d("zhiwei","load js dom");
+        Intent intent = new Intent("broadcast of yhdm");
+        intent.putExtra("type","load_js_dom");
+        intent.putExtra("data",msg);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    @JavascriptInterface
+    public void load_js_img(String msg) {
+        Log.d("zhiwei","load js img");
+        Intent intent = new Intent("broadcast of yhdm");
+        intent.putExtra("type","load_js_img");
+
+        new Thread(new Runnable(){
+            @Override
+            public void run(){
+                if (! msg.equals("0")){
+                    try {
+                        Thread.sleep(Long.parseLong(msg));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.d("zhiwei","wait for "+msg);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            }
+        }).start();
     }
 
 }

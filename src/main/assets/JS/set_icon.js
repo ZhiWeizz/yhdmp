@@ -10,4 +10,4 @@ div_head.insertBefore(btn_setting,div_head.childNodes[0]);
 btn_setting.onclick=function(){
     btn_setting.style.border='2.4px solid #66ccff';
     Settings.load_settings();
-}
+};

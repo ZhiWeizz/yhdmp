@@ -3,7 +3,7 @@ var div6o=document.getElementsByClassName('playbg');
 
 let btn_op = document.createElement('button');
 btn_op.innerHTML='跳op';
-if ('%s'=='true'){
+if ('%s'==='true'){
     btn_op.style='float:left';
     div6o[0].insertBefore(btn_op,div4o[0]);
 }
@@ -32,7 +32,7 @@ $(function(){
         time_show_div.innerText='0:00';
         div6o[0].insertBefore(time_show_div,div4o[0]);
 
-        if ('%s'=='true'){
+        if ('%s'==='true'){
             Settings.print('can skip');
             getVideo().currentTime='%s';
         };
@@ -54,7 +54,7 @@ $(function(){
         })
     };
 
-    if ('%s'=='true'){
+    if ('%s'==='true'){
         var times_for_load = 1000; Settings.print('allow to log');
         var interval = setInterval(function(){
             if (getVideo() || times_for_load <0){
