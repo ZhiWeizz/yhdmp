@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 }else {
-                    return !url.contains("yhdmp");
+                    return !url.contains("yhdm");
                 }
             }
 
